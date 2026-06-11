@@ -1,5 +1,7 @@
 const express = require('express');
 const multer = require('multer');
+const https = require('https');
+const axios = require('axios');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const StudyMaterial = require('../models/StudyMaterial');
@@ -19,20 +21,21 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'study_materials', 
-    resource_type: 'auto',      
+    folder: 'study_materials',
+    resource_type: 'image', 
+    format: 'pdf',
+    type: 'upload',
     public_id: (req, file) => {
       const safeName = file.originalname
         .replace(/[^a-zA-Z0-9._-]/g, '_')
-        .replace(/\.[^/.]+$/, ""); 
+        .replace(/\.[^/.]+$/, '');
       return `${Date.now()}-${safeName}`;
     }
   },
 });
-
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1 * 1024 * 1024 }, 
+  limits: { fileSize: 100 * 1024 * 1024 }, 
 });
 
 const populateTeacher = { path: 'teacher', select: 'name email role profileImage department rollNumber className semester college branch section' };
@@ -120,19 +123,7 @@ const notifyStudents = async ({ title, message, type = 'study-material', metadat
   );
 };
 
-router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file || !req.file.path) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
 
-    const fileUrl = req.file.path; 
-    return res.json({ success: true, fileUrl });
-  } catch (error) {
-    console.error('Upload study material file error:', error);
-    return res.status(500).json({ message: 'Failed to upload file' });
-  }
-});
 
 router.get('/', requireAuth, async (req, res) => {
   try {
@@ -292,25 +283,68 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 });
 
+router.post('/upload', requireAuth, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    
+    return res.json({ success: true, fileUrl: req.file.path });
+  } catch (error) {
+    
+    return res.status(500).json({ message: 'Upload failed' });
+  }
+});
+
 router.get('/download/:id', requireAuth, async (req, res) => {
   try {
-    const material = await StudyMaterial.findById(req.params.id).populate(populateTeacher);
-    if (!material) {
-      return res.status(404).json({ message: 'Material not found' });
+    const material = await StudyMaterial.findById(req.params.id);
+    if (!material) return res.status(404).json({ message: 'Material not found' });
+    if (!material.fileUrl) return res.status(404).json({ message: 'File not available' });
+
+    const fileUrl = material.fileUrl;
+
+    // public_id nikalo
+    const uploadIndex = fileUrl.indexOf('/upload/');
+    const afterUpload = fileUrl.substring(uploadIndex + 8);
+    const withoutVersion = afterUpload.replace(/^v\d+\//, '');
+    const lastDot = withoutVersion.lastIndexOf('.');
+    const hasExt = lastDot > withoutVersion.lastIndexOf('/');
+    const publicId = hasExt ? withoutVersion.substring(0, lastDot) : withoutVersion;
+
+
+
+   
+    const authUrl = cloudinary.utils.private_download_url(
+      publicId,
+      'pdf',
+      {
+        resource_type: 'image',
+        type: 'upload',
+        expires_at: Math.floor(Date.now() / 1000) + 300,
+      }
+    );
+
+
+    const response = await axios.get(authUrl, { responseType: 'stream' });
+
+    const safeTitle = (material.title || 'file').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeTitle}.pdf"`);
+    if (response.headers['content-length']) {
+      res.setHeader('Content-Length', response.headers['content-length']);
     }
 
-    if (req.user.role === 'student' && !matchesAudience(material, req.user)) {
-      return res.status(403).json({ message: 'You are not allowed to access this material' });
-    }
+    response.data.on('error', (err) => {
+      if (!res.headersSent) res.status(500).json({ message: 'Stream failed' });
+    });
 
-    if (!material.fileUrl) {
-      return res.status(404).json({ message: 'File not available', fileNotAvailable: true });
-    }
+    response.data.pipe(res);
 
-    return res.redirect(material.fileUrl);
   } catch (error) {
-    console.error('Download study material error:', error);
-    return res.status(500).json({ message: 'Failed to download file' });
+    console.error('Download error:', error.message);
+    return res.status(500).json({ message: 'Download failed: ' + error.message });
   }
 });
 

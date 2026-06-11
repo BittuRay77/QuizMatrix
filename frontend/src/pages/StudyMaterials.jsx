@@ -210,81 +210,44 @@ const StudyMaterials = () => {
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
+const handleDownload = async (material) => {
+  const toastId = toast.loading('Preparing your PDF...');
+  try {
+    const response = await api.get(`/study-materials/download/${material._id}`, {
+      responseType: 'blob',
+    });
 
-  const handleDownload = async (material) => {
-    try {
-      toast.loading('Preparing download...');
-      const response = await api.get(`/study-materials/download/${material._id}`, {
-        responseType: 'blob',
-      });
+    const filename = `${material.title || 'file'}.pdf`;
+    const url = window.URL.createObjectURL(
+      new Blob([response.data], { type: 'application/pdf' })
+    );
 
-      const contentType = response.headers['content-type'];
-      if (contentType?.includes('application/json')) {
-        const errorText = await response.data.text();
-        const errorData = JSON.parse(errorText);
-        toast.dismiss();
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => window.URL.revokeObjectURL(url), 150);
 
-        if (errorData.fileNotAvailable) {
-          if (errorData.requiresReupload) {
-            toast.error('⚠️ This file was uploaded before cloud storage migration and is no longer available. Please ask the teacher to re-upload it.', {
-              duration: 7000,
-              style: {
-                background: '#FEF3C7',
-                color: '#92400E',
-                fontWeight: '500'
-              }
-            });
-          } else {
-            toast.error('⚠️ File no longer available on server. Please contact the teacher to re-upload this file.', {
-              duration: 6000,
-              style: {
-                background: '#FEF3C7',
-                color: '#92400E',
-                fontWeight: '500'
-              }
-            });
-          }
-        } else {
-          toast.error(errorData.message || 'Download failed');
-        }
-        return;
-      }
+    toast.dismiss(toastId);
+    toast.success('Download started!');
 
-      toast.dismiss();
-      toast.loading('Downloading file...');
+  } catch (error) {
+    toast.dismiss(toastId);
+    console.error('Download error:', error);
 
-      const blob = response.data;
-      const blobUrl = window.URL.createObjectURL(blob);
-      
-      // Extract filename from Content-Disposition header or use default
-      const disposition = response.headers['content-disposition'];
-      let fileName = `${material.title}.pdf`;
-      if (disposition && disposition.includes('filename=')) {
-        const match = disposition.match(/filename="?([^"]+)"?/);
-        if (match) fileName = match[1];
-      }
-      
-      // Create a temporary anchor element to trigger download
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = fileName;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Clean up blob URL
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
-      
-      toast.dismiss();
-      toast.success('Download completed! Check your downloads folder.');
-    } catch (error) {
-      console.error('Download error:', error);
-      toast.dismiss();
-      toast.error(error.message || 'Failed to download file. Please try again.');
+    if (error.response?.data instanceof Blob) {
+      const text = await error.response.data.text();
+      try {
+        const { message } = JSON.parse(text);
+        toast.error(message || 'Download failed');
+      } catch { toast.error('Download failed'); }
+    } else {
+      toast.error('Download failed');
     }
-  };
-
+  }
+};
   const handleReadContent = (material) => {
     setSelectedMaterial(material);
     setShowContentModal(true);

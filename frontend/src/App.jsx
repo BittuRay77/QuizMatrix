@@ -7,7 +7,7 @@ import { ThemeProvider } from './context/ThemeContext.jsx';
 // Components
 import Loading from './components/Loading.jsx';
 import Navbar from './components/Navbar.jsx';
-
+import NotFound from './components/ServerDis.jsx';
 // Pages
 import AIInterviewHistory from './pages/AIInterviewHistory.jsx';
 import AIInterviewPractice from './pages/AIInterviewPractice.jsx';
@@ -74,50 +74,8 @@ const PublicRoute = ({ children }) => {
 };
 
 // 404 Page Component
-const NotFound = () => {
-  const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
-  
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0f172a] animate-fadeIn">
-      <div className="text-center px-4">
-        <div className="inline-block">
-          <h1 className="text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-400 dark:to-primary-600 mb-4">
-            404
-          </h1>
-        </div>
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Page Not Found
-        </h2>
-        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="flex justify-center space-x-4">
-          <button 
-            onClick={() => window.history.back()}
-            className="btn-secondary inline-flex items-center space-x-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Go Back</span>
-          </button>
-          {isAuthenticated && (
-            <button 
-              onClick={() => navigate(user?.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard')}
-              className="btn-primary inline-flex items-center space-x-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <span>Dashboard</span>
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+
+
 
 // Main App Content
 const AppContent = () => {

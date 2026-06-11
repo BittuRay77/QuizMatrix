@@ -1,16 +1,17 @@
 import React from 'react';
 
 const Loading = ({ size = 'lg', text = 'Loading...', fullScreen = false }) => {
+
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8',
-    xl: 'w-12 h-12'
+    sm: 'w-10 h-14 text-xl',
+    md: 'w-14 h-20 text-2xl',
+    lg: 'w-20 h-28 text-4xl',
+    xl: 'w-28 h-36 text-6xl'
   };
 
   const Container = fullScreen ? 'div' : React.Fragment;
   const containerProps = fullScreen ? {
-    className: "fixed inset-0 bg-white dark:bg-[#0f172a] flex items-center justify-center z-50",
+    className: "fixed inset-0 bg-slate-50 dark:bg-[#0f172a] flex items-center justify-center z-50",
     role: "status",
     "aria-live": "polite",
     "aria-label": text
@@ -18,34 +19,59 @@ const Loading = ({ size = 'lg', text = 'Loading...', fullScreen = false }) => {
 
   return (
     <Container {...containerProps}>
-      <div className="flex flex-col items-center justify-center min-h-[200px] animate-fadeIn">
-        <div className={`${sizeClasses[size]} animate-spin`} role="img" aria-label="Loading spinner">
-          <svg
-            className="w-full h-full text-primary-600"
-            fill="none"
-            viewBox="0 0 24 24"
+      <div className="flex flex-col items-center justify-center min-h-[250px] animate-fadeIn p-4">
+        
+        {/* 3D Quiz Container */}
+        <div className="relative flex items-center justify-center">
+          
+          {/* 3D Flipping Quiz Card */}
+          <div 
+            className={`${sizeClasses[size]} bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-xl shadow-2xl flex items-center justify-center text-white font-black border-2 border-white/20 select-none`}
+            role="img" 
+            aria-label="Loading quiz indicator"
+            style={{
+              transformStyle: 'preserve-3d',
+              perspective: '1000px',
+              animation: 'quizCardAnim 2s infinite ease-in-out'
+            }}
           >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+            <span className="drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]">?</span>
+          </div>
+
+          {/* Dynamic Glow Shadow Underneath */}
+          <div 
+            className="absolute -bottom-4 w-12 h-2 bg-indigo-500/30 dark:bg-blue-400/20 rounded-full blur-sm"
+            style={{
+              animation: 'shadowAnim 2s infinite ease-in-out'
+            }}
+          ></div>
         </div>
+
+        {/* Loading Text */}
         {text && (
-          <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 animate-pulse">
-            {text}
-          </p>
+          <div className="text-center mt-6 space-y-1">
+            <p className="text-sm sm:text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 tracking-wide uppercase">
+              {text}
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 animate-pulse">
+              Please wait...
+            </p>
+          </div>
         )}
       </div>
+
+      {/* CSS Keyframes for 3D Effects */}
+      <style>{`
+        @keyframes quizCardAnim {
+          0% { transform: translateY(0px) rotateY(0deg) rotateX(10deg); }
+          50% { transform: translateY(-20px) rotateY(180deg) rotateX(-10deg); }
+          100% { transform: translateY(0px) rotateY(360deg) rotateX(10deg); }
+        }
+        @keyframes shadowAnim {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(0.6); opacity: 0.3; filter: blur(6px); }
+        }
+      `}</style>
     </Container>
   );
 };

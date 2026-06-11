@@ -17,10 +17,11 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'previous_papers', 
-    resource_type: 'raw',     
+    folder: 'previous_papers',
+    // 'auto' use karna behtar hai, ye file ka type khud detect kar leta hai
+    resource_type: 'auto', 
+    format: 'pdf', // Isse Cloudinary file ko force karega PDF format mein rakhne ke liye
     public_id: (req, file) => {
-
       const safeName = file.originalname
         .replace(/[^a-zA-Z0-9._-]/g, '_')
         .replace(/\.[^/.]+$/, ""); 
@@ -31,7 +32,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1 * 1024 * 1024 }, 
+  limits: { fileSize: 10 * 1024 * 1024 }, 
 });
 
 const populateTeacher = { path: 'teacher', select: 'name email role profileImage department rollNumber class semester' };
@@ -149,17 +150,19 @@ router.get('/download/:id', requireAuth, async (req, res) => {
       return res.status(404).json({ message: 'File not available', fileNotAvailable: true });
     }
 
-    एं
-    paper.downloadCount += 1;
-    await paper.save();
+    // Atomic increment
+    await PreviousPaper.findByIdAndUpdate(req.params.id, { $inc: { downloadCount: 1 } });
 
-    return res.redirect(paper.fileUrl);
+    // Redirect ke bajaye JSON URL bhejein
+    return res.status(200).json({ 
+      success: true, 
+      downloadUrl: paper.fileUrl 
+    });
   } catch (error) {
     console.error('Download previous paper error:', error);
     return res.status(500).json({ message: 'Failed to download file' });
   }
 });
-
 
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
@@ -167,16 +170,25 @@ router.delete('/:id', requireAuth, async (req, res) => {
       return res.status(403).json({ message: 'Only teachers can delete papers' });
     }
 
-    const paper = await PreviousPaper.findOne({ _id: req.params.id, teacher: req.userId });
+    // Yahan req.userId use karein (jo aapne upload mein use kiya tha)
+    const paper = await PreviousPaper.findOne({ _id: req.params.id, teacher: req.user.id }); 
+    
     if (!paper) {
-      return res.status(404).json({ message: 'Previous paper not found' });
+      // Yahan console.log karein debugging ke liye
+      
+      return res.status(404).json({ message: 'Paper not found or unauthorized' });
     }
 
-    await PreviousPaper.findByIdAndDelete(paper._id);
+   
+    const publicId = paper.fileUrl.split('/').pop().split('.')[0]; 
+    await cloudinary.uploader.destroy(`previous_papers/${publicId}`, { resource_type: 'raw' });
 
-    return res.json({ success: true, message: 'Paper deleted successfully' });
+    // 3. Database se delete karein
+    await PreviousPaper.findByIdAndDelete(req.params.id);
+
+    return res.json({ success: true, message: 'Paper and file deleted successfully' });
   } catch (error) {
-    console.error('Delete previous paper error:', error);
+    console.error('Delete error:', error);
     return res.status(500).json({ message: 'Failed to delete paper' });
   }
 });

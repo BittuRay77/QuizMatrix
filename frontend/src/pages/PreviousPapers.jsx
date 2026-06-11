@@ -188,75 +188,38 @@ const PreviousPapers = () => {
     }
   };
 
-  const handleDownload = async (paper) => {
-    try {
-      toast.loading('Preparing download...');
+const handleDownload = async (paper) => {
+  try {
+    toast.loading('Preparing your PDF...');
 
-      const response = await api.get(`/previous-papers/download/${paper._id}`, {
-        responseType: 'blob'
-      });
+    const response = await api.get(`/previous-papers/download/${paper._id}`);
+    const { downloadUrl } = response.data;
 
-      toast.dismiss();
-      toast.loading('Downloading file...');
+    // Direct fetch karein, type check hata dein
+    const fileFetch = await fetch(downloadUrl);
+    if (!fileFetch.ok) throw new Error("Cloudinary file not accessible");
 
-      const blob = response.data;
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      const disposition = response.headers?.['content-disposition'] || response.headers?.['Content-Disposition'];
-      let fileName = 'paper.pdf';
-      if (disposition && disposition.includes('filename=')) {
-        const match = disposition.match(/filename="?([^"]+)"?/);
-        if (match) fileName = match[1];
-      }
-
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = fileName;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
-      
-      toast.dismiss();
-      toast.success('Download completed! Check your downloads folder.');
-    } catch (error) {
-      console.error('Download error:', error);
-      toast.dismiss();
-      let errorMessage = error?.response?.data?.message || error.message || 'Download failed';
-      let fileNotAvailable = error?.response?.data?.fileNotAvailable || false;
-
-      if (error?.response?.data instanceof Blob && error.response.data.type?.includes('application/json')) {
-        try {
-          const parsedError = JSON.parse(await error.response.data.text());
-          errorMessage = parsedError.message || errorMessage;
-          fileNotAvailable = parsedError.fileNotAvailable || fileNotAvailable;
-        } catch (parseError) {
-          console.error('Failed to parse download error response:', parseError);
-        }
-      }
-      
-      if (fileNotAvailable ||
-          errorMessage.includes('not found on server') || 
-          errorMessage.includes('File not found') ||
-          errorMessage.includes('fileNotAvailable')) {
-        toast.error('⚠️ File no longer available on server. Please contact the teacher to re-upload this file.', {
-          duration: 6000,
-          style: {
-            background: '#FEF3C7',
-            color: '#92400E',
-            fontWeight: '500'
-          }
-        });
-      } else if (errorMessage.includes('Previous paper not found')) {
-        toast.error('This paper has been deleted or is no longer available.');
-      } else {
-        toast.error(errorMessage || 'Failed to download file. Please try again.');
-      }
-    }
-  };
-
+    const blob = await fileFetch.blob();
+    
+    // Yahan sirf blob ka content download karein, type check ki zarurat nahi
+    const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${paper.title || 'paper'}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    toast.dismiss();
+    toast.success('Download started!');
+  } catch (error) {
+    toast.dismiss();
+    console.error("Download error:", error);
+    toast.error("Download failed. The file format might be incorrect.");
+  }
+};
   const handleDelete = async (paperId) => {
     if (!window.confirm('Are you sure you want to delete this paper?')) {
       return;
@@ -621,12 +584,20 @@ const PreviousPapers = () => {
                 </div>
 
                 <button
-                  onClick={() => handleDownload(paper)}
-                  className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 active:from-green-800 active:to-teal-800 transition-all flex items-center justify-center gap-2 text-xs sm:text-sm md:text-base touch-manipulation"
-                >
-                  <FaDownload className="text-xs sm:text-sm" />
-                  Download PDF
-                </button>
+  onClick={() => handleDownload(paper)}
+  className="w-full py-2 sm:py-2.5 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 active:from-green-800 active:to-teal-800 transition-all flex items-center justify-center gap-2 text-xs sm:text-sm md:text-base touch-manipulation"
+>
+  <FaDownload className="text-xs sm:text-sm" />
+  Download PDF
+</button>
+
+{user?.role === 'teacher' && (paper.teacher?._id === user.id || paper.teacher === user.id) && (
+   <button onClick={() => handleDelete(paper._id)}  className="text-red-600 hover:text-red-700 active:text-red-800 p-1 touch-manipulation"
+    title="Delete">
+      <FaTrash /> Delete
+   </button>
+)}
+
               </div>
             ))}
           </div>
