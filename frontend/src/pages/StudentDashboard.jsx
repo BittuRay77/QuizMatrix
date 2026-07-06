@@ -7,6 +7,17 @@ import Loading from '../components/Loading.jsx';
 import Tabs from '../components/Tabs.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { formatDate } from '../utils/helpers';
+import {
+  FileCheck2,
+  BarChart3,
+  Clock,
+  BookOpen,
+  FileText,
+  FileSpreadsheet,
+  FileDown,
+  KeyRound,
+  ArrowRight,
+} from 'lucide-react';
 
 const StudentDashboard = () => {
   const { user, api } = useAuth();
@@ -132,11 +143,11 @@ const StudentDashboard = () => {
     if (!result) return;
 
     const doc = new jsPDF();
-    
+
     doc.setFontSize(18);
     doc.setTextColor(59, 130, 246);
     doc.text('Quiz Matrix - Exam Result', 14, 20);
-    
+
     doc.setFontSize(11);
     doc.setTextColor(0, 0, 0);
     doc.text(`Student: ${user?.name || 'N/A'}`, 14, 35);
@@ -156,6 +167,8 @@ const StudentDashboard = () => {
     return <Loading />;
   }
 
+  const activeExamsList = availableExams.filter(isExamActive);
+
   const tabs = [
     {
       name: 'Available Exams',
@@ -164,15 +177,15 @@ const StudentDashboard = () => {
           {loading ? (
             <Loading text="Loading exams..." />
           ) : availableExams.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
               {availableExams.map((exam) => (
                 <ExamCard key={exam._id} exam={exam} onStart={() => handleExamClick(exam)} />
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">No available exams</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Check back later for new exams.</p>
+              <h3 className="text-lg font-medium text-[#3D3929] dark:text-[#F4F1EA]">No available exams</h3>
+              <p className="mt-1 text-sm text-[#83786a] dark:text-[#c2b8a3]">Check back later for new exams.</p>
             </div>
           )}
         </section>
@@ -183,23 +196,21 @@ const StudentDashboard = () => {
       content: (
         <section>
           {myResults.length > 0 ? (
-            <div className="border border-gray-200 dark:border-dark-800 rounded-2xl overflow-hidden">
-              <ul>
-                {myResults.map((result) => (
-                  <ResultItem 
-                    key={result._id} 
-                    result={result} 
-                    navigate={navigate}
-                    onDownloadExcel={downloadResultExcel}
-                    onDownloadPDF={downloadResultPDF}
-                  />
-                ))}
-              </ul>
+            <div className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-xl sm:rounded-2xl divide-y divide-[#E6E0D4] dark:divide-[#3a362f] overflow-hidden">
+              {myResults.map((result) => (
+                <ResultItem
+                  key={result._id}
+                  result={result}
+                  navigate={navigate}
+                  onDownloadExcel={downloadResultExcel}
+                  onDownloadPDF={downloadResultPDF}
+                />
+              ))}
             </div>
           ) : (
             <div className="text-center py-12">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">No results yet</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Your results will appear here after you take an exam.</p>
+              <h3 className="text-lg font-medium text-[#3D3929] dark:text-[#F4F1EA]">No results yet</h3>
+              <p className="mt-1 text-sm text-[#83786a] dark:text-[#c2b8a3]">Your results will appear here after you take an exam.</p>
             </div>
           )}
         </section>
@@ -208,129 +219,133 @@ const StudentDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a]">
-      <div className="max-w-4xl mx-auto py-4 sm:py-6 px-3 sm:px-4">
-        <header className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-            Welcome, {user?.name}!
-          </h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
-            Your learning journey starts here.
-          </p>
-        </header>
+    <div className="min-h-screen bg-[#F4F1EA] dark:bg-[#1A1815]">
+      <main className="max-w-7xl mx-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
-          <StatCard
-            icon="📝"
-            title="Exams Taken"
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#3D3929] dark:text-[#F4F1EA]">Welcome, {user?.name}!</h1>
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-[#83786a] dark:text-[#c2b8a3]">Your learning journey starts here.</p>
+        </div>
+
+        {/* Stats Section — full width on every breakpoint */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6 lg:mb-8">
+          <button
             onClick={() => setActiveTab(1)}
-            value={<div className="text-lg font-bold">{summary?.totalExamsTaken ?? 0}</div>}
-          />
-          <StatCard
-            icon="📊"
-            title="Average Score"
+            className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg sm:rounded-xl p-2.5 sm:p-4 lg:p-5 text-left w-full hover:border-[#2563EB] hover:shadow-sm transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <FileCheck2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#83786a] dark:text-[#c2b8a3] flex-shrink-0" />
+              <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-[#83786a] dark:text-[#c2b8a3] truncate">Exams Taken</p>
+            </div>
+            <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-[#3D3929] dark:text-[#F4F1EA] mt-1 sm:mt-2">{summary?.totalExamsTaken ?? 0}</p>
+          </button>
+
+          <button
             onClick={() => setActiveTab(1)}
-            value={
-              (() => {
-                const avg = Number(summary?.averageScore) || 0;
-                const pct = Math.max(0, Math.min(100, avg));
-                return (
-                  <div className="w-full">
-                    <div className="text-lg font-bold">{pct.toFixed(1)}%</div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2 overflow-hidden">
-                      <div className="bg-green-500 h-2" style={{ width: `${pct}%` }} />
-                    </div>
+            className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg sm:rounded-xl p-2.5 sm:p-4 lg:p-5 text-left w-full hover:border-[#2563EB] hover:shadow-sm transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#83786a] dark:text-[#c2b8a3] flex-shrink-0" />
+              <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-[#83786a] dark:text-[#c2b8a3] truncate">Average Score</p>
+            </div>
+            {(() => {
+              const avg = Number(summary?.averageScore) || 0;
+              const pct = Math.max(0, Math.min(100, avg));
+              return (
+                <div className="mt-1 sm:mt-2">
+                  <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-[#3D3929] dark:text-[#F4F1EA]">{pct.toFixed(1)}%</p>
+                  <div className="w-full bg-[#E6E0D4] dark:bg-[#3a362f] rounded-full h-1 mt-1.5 sm:mt-2 overflow-hidden">
+                    <div className="bg-green-500 h-1" style={{ width: `${pct}%` }} />
                   </div>
-                );
-              })()
-            }
-          />
-          <StatCard
-            icon="⏳"
-            title="Active Exams"
+                </div>
+              );
+            })()}
+          </button>
+
+          <button
             onClick={() => setActiveTab(0)}
-            value={
-              (() => {
-                const activeExams = availableExams.filter(isExamActive);
-                return (
-                  <div>
-                    <div className="text-lg font-bold">{activeExams.length}</div>
-                    {activeExams.length > 0 ? (
-                      <ul className="mt-2 text-xs text-gray-600 dark:text-gray-300 space-y-1">
-                        {activeExams.slice(0, 3).map((e) => (
-                          <li key={e._id} className="truncate">{e.title}</li>
-                        ))}
-                        {activeExams.length > 3 && (
-                          <li className="text-xs text-gray-500">+{activeExams.length - 3} more</li>
-                        )}
-                      </ul>
-                    ) : (
-                      <p className="mt-2 text-xs text-gray-500">No active exams</p>
-                    )}
+            className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg sm:rounded-xl p-2.5 sm:p-4 lg:p-5 text-left w-full hover:border-[#2563EB] hover:shadow-sm transition-all cursor-pointer"
+          >
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#83786a] dark:text-[#c2b8a3] flex-shrink-0" />
+              <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-[#83786a] dark:text-[#c2b8a3] truncate">Active Exams</p>
+            </div>
+            <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-[#3D3929] dark:text-[#F4F1EA] mt-1 sm:mt-2">{activeExamsList.length}</p>
+          </button>
+        </div>
+
+        {/* Main content: sidebar (quick access + join key) sits beside the tabs on desktop,
+            and stacks above them on mobile/tablet */}
+        <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start">
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1 lg:order-2 space-y-3 sm:space-y-4 mb-4 sm:mb-6 lg:mb-0">
+
+            {/* Quick Access */}
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
+              <button
+                onClick={() => navigate('/study-materials')}
+                className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg p-2.5 sm:p-3 lg:p-4 hover:border-[#2563EB] hover:shadow-sm transition-all text-left"
+              >
+                <div className="flex items-center gap-2 lg:gap-3">
+                  
+                  <div className="min-w-0">
+                    <h3 className="text-xs sm:text-sm font-bold text-[#3D3929] dark:text-[#F4F1EA] truncate">Study Materials</h3>
+                    <p className="text-[10px] sm:text-xs text-[#83786a] dark:text-[#c2b8a3] truncate">Access notes & PDFs</p>
                   </div>
-                );
-              })()
-            }
-          />
-        </div>
+                </div>
+              </button>
 
-        {/* Quick Access Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <button
-            onClick={() => navigate('/study-materials')}
-            className="bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-blue-500 dark:hover:border-blue-500 active:scale-95 transition-all text-left touch-manipulation"
-          >
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              <span className="text-2xl sm:text-3xl">📚</span>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">Study Materials</h3>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Access notes & PDFs</p>
+              <button
+                onClick={() => navigate('/previous-papers')}
+                className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg p-2.5 sm:p-3 lg:p-4 hover:border-[#2563EB] hover:shadow-sm transition-all text-left"
+              >
+                <div className="flex items-center gap-2 lg:gap-3">
+                  
+                  <div className="min-w-0">
+                    <h3 className="text-xs sm:text-sm font-bold text-[#3D3929] dark:text-[#F4F1EA] truncate">Previous Papers</h3>
+                    <p className="text-[10px] sm:text-xs text-[#83786a] dark:text-[#c2b8a3] truncate">Practice past exams</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Join with Exam Key */}
+            <div className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg p-3 sm:p-4 lg:p-5">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                
+                <h3 className="text-sm sm:text-base font-bold text-[#3D3929] dark:text-[#F4F1EA]">Join with Exam Key</h3>
+              </div>
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
+                <input
+                  type="text"
+                  value={examKey}
+                  onChange={(e) => setExamKey(e.target.value)}
+                  placeholder="Enter Exam Key"
+                  className="flex-grow px-3 py-2 text-sm border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-white dark:bg-[#1A1815] text-[#3D3929] dark:text-[#F4F1EA] placeholder-[#a89d89]"
+                />
+                <button
+                  onClick={joinExamByKey}
+                  className="px-4 py-2 bg-[#2563EB] text-white font-semibold text-sm rounded-full hover:bg-[#1D4ED8] active:bg-[#1E40AF] transition-colors touch-manipulation whitespace-nowrap"
+                >
+                  Join
+                </button>
               </div>
             </div>
-          </button>
-          <button
-            onClick={() => navigate('/previous-papers')}
-            className="bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-slate-700 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-blue-500 dark:hover:border-blue-500 active:scale-95 transition-all text-left touch-manipulation"
-          >
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              <span className="text-2xl sm:text-3xl">📄</span>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">Previous Papers</h3>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Practice past exams</p>
-              </div>
-            </div>
-          </button>
-        </div>
+          </div>
 
-        <div className="bg-white dark:bg-[#1e293b] rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-4 sm:p-6 mb-6 sm:mb-8">
-          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">Join with Exam Key</h3>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <input
-              type="text"
-              value={examKey}
-              onChange={(e) => setExamKey(e.target.value)}
-              placeholder="Enter Exam Key"
-              className="flex-grow px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white"
-            />
-            <button
-              onClick={joinExamByKey}
-              className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white font-semibold text-sm sm:text-base rounded-full hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation whitespace-nowrap"
-            >
-              Join Exam
-            </button>
+          {/* Tabs Section */}
+          <div className="lg:col-span-2 lg:order-1 bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+            <Tabs tabs={tabs} activeIndex={activeTab} onTabChange={setActiveTab} />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#1e293b] rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-4 sm:p-6">
-          <Tabs tabs={tabs} activeIndex={activeTab} onTabChange={setActiveTab} />
-        </div>
-
         {isModalOpen && (
-            <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-50 p-3 sm:p-4">
-            <div className="bg-white dark:bg-[#1e293b] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl w-full max-w-md border border-gray-200 dark:border-slate-700">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">Enter Exam Key</h2>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
+          <div className="fixed inset-0 bg-black/55 flex items-center justify-center z-50 p-3 sm:p-4">
+            <div className="bg-white dark:bg-[#262421] rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl w-full max-w-md border border-[#E6E0D4] dark:border-[#3a362f]">
+              <h2 className="text-lg sm:text-xl font-bold text-[#3D3929] dark:text-[#F4F1EA] mb-2 sm:mb-3">Enter Exam Key</h2>
+              <p className="text-xs sm:text-sm text-[#83786a] dark:text-[#c2b8a3] mb-4 sm:mb-6">
                 To start the exam "{selectedExam?.title}", please enter the unique key provided by your teacher.
               </p>
               <input
@@ -338,18 +353,18 @@ const StudentDashboard = () => {
                 value={examKey}
                 onChange={(e) => setExamKey(e.target.value)}
                 placeholder="Unique Exam Key"
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 dark:bg-slate-800 text-gray-900 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent bg-white dark:bg-[#1A1815] text-[#3D3929] dark:text-[#F4F1EA] placeholder-[#a89d89]"
               />
               <div className="mt-4 sm:mt-6 flex gap-2 sm:gap-3">
                 <button
                   onClick={closeModal}
-                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-gray-700 dark:text-gray-300 font-semibold rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 active:scale-95 transition-all border border-gray-300 dark:border-slate-700 touch-manipulation"
+                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-[#3D3929] dark:text-[#F4F1EA] font-semibold rounded-full hover:bg-[#F4F1EA] dark:hover:bg-[#1A1815] active:scale-95 transition-all border border-[#E6E0D4] dark:border-[#3a362f] touch-manipulation"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleModalSubmit}
-                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 active:bg-blue-800 transition-all touch-manipulation"
+                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-[#2563EB] text-white font-semibold rounded-full hover:bg-[#1D4ED8] active:bg-[#1E40AF] transition-all touch-manipulation"
                 >
                   Start Exam
                 </button>
@@ -357,95 +372,74 @@ const StudentDashboard = () => {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
-  );
-};
-
-const StatCard = ({ icon, title, value, onClick }) => {
-  const Wrapper = onClick ? 'button' : 'div';
-  return (
-    <Wrapper
-      onClick={onClick}
-      className={`bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl sm:rounded-2xl p-3 sm:p-6 flex items-center space-x-2 sm:space-x-4 hover:border-primary-500 dark:hover:border-primary-500 transition-all ${onClick ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-500' : ''}`}
-    >
-      <span className="text-xl sm:text-2xl flex-shrink-0">{icon}</span>
-      <div className="min-w-0 text-left">
-        <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">{title}</p>
-        <div className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">{value}</div>
-      </div>
-    </Wrapper>
   );
 };
 
 const ExamCard = ({ exam, onStart }) => (
-  <div 
-    className="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer hover:border-primary-500 dark:hover:border-primary-500 active:scale-95 transition-all flex flex-col justify-between touch-manipulation"
+  <div
+    className="bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer hover:border-[#2563EB] hover:shadow-md active:scale-[0.98] transition-all flex flex-col justify-between touch-manipulation"
     onClick={() => onStart(exam)}
   >
     <div>
       <div className="flex justify-between items-start gap-2">
-        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white pr-2">{exam.title}</h3>
-        <span className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap flex-shrink-0 ${
-          isExamActive(exam) 
-            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
-            : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-        }`}>
+        <h3 className="text-base sm:text-lg font-bold text-[#3D3929] dark:text-[#F4F1EA] pr-2">{exam.title}</h3>
+        <span className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap flex-shrink-0 ${isExamActive(exam)
+            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+            : 'bg-[#F4F1EA] text-[#3D3929] dark:bg-[#3a362f] dark:text-[#c2b8a3]'
+          }`}>
           {isExamActive(exam) ? 'Active' : 'Upcoming'}
         </span>
       </div>
-      <p className="text-xs sm:text-sm font-medium text-primary-500 dark:text-primary-400 mt-1">{exam.subject}</p>
-      <p className="text-gray-600 dark:text-gray-400 mt-2 sm:mt-3 text-xs sm:text-sm line-clamp-2">{exam.description}</p>
+      <p className="text-xs sm:text-sm font-medium text-[#2563EB] dark:text-[#93C5FD] mt-1">{exam.subject}</p>
+      <p className="text-[#83786a] dark:text-[#c2b8a3] mt-2 sm:mt-3 text-xs sm:text-sm line-clamp-2">{exam.description}</p>
     </div>
-    <div className="mt-4 sm:mt-6 border-t border-gray-200 dark:border-dark-800 pt-3 sm:pt-4">
-      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-        <span>Duration: <strong className="text-gray-900 dark:text-white">{exam.duration} mins</strong></span>
-        <span>Marks: <strong className="text-gray-900 dark:text-white">{exam.totalMarks}</strong></span>
+    <div className="mt-4 sm:mt-6 border-t border-[#E6E0D4] dark:border-[#3a362f] pt-3 sm:pt-4">
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs sm:text-sm text-[#83786a] dark:text-[#c2b8a3]">
+        <span>Duration: <strong className="text-[#3D3929] dark:text-[#F4F1EA]">{exam.duration} mins</strong></span>
+        <span>Marks: <strong className="text-[#3D3929] dark:text-[#F4F1EA]">{exam.totalMarks}</strong></span>
       </div>
-      <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2">
-        Starts: <strong className="text-gray-900 dark:text-white">{formatDate(exam.startTime)}</strong>
+      <div className="text-xs sm:text-sm text-[#83786a] dark:text-[#c2b8a3] mt-1 sm:mt-2">
+        Starts: <strong className="text-[#3D3929] dark:text-[#F4F1EA]">{formatDate(exam.startTime)}</strong>
       </div>
     </div>
   </div>
 );
 
 const ResultItem = ({ result, navigate, onDownloadExcel, onDownloadPDF }) => (
-  <li className="p-3 sm:p-5 hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors border-b border-gray-200 dark:border-dark-800 last:border-0">
+  <div className="px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-[#F4F1EA] dark:hover:bg-[#1A1815] transition-colors">
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white">{result.exam.title}</p>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p className="font-semibold text-sm sm:text-base text-[#3D3929] dark:text-[#F4F1EA] truncate">{result.exam.title}</p>
+        <p className="text-xs sm:text-sm text-[#83786a] dark:text-[#c2b8a3] mt-0.5">
           Score: {result.obtainedMarks}/{result.totalMarks} ({((result.obtainedMarks / result.totalMarks) * 100).toFixed(1)}%)
         </p>
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <button 
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <button
           onClick={() => onDownloadExcel(result)}
-          className="p-1.5 sm:p-2 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-lg transition-colors touch-manipulation"
+          className="p-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-lg transition-colors touch-manipulation"
           title="Download Excel"
         >
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+          <FileSpreadsheet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
-        <button 
+        <button
           onClick={() => onDownloadPDF(result)}
-          className="p-1.5 sm:p-2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-lg transition-colors touch-manipulation"
+          className="p-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-lg transition-colors touch-manipulation"
           title="Download PDF"
         >
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
+          <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
-        <button 
-          onClick={() => navigate(`/results/${result.exam._id}`)} 
-          className="text-xs sm:text-sm font-medium text-primary-500 hover:text-primary-600 active:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 whitespace-nowrap touch-manipulation"
+        <button
+          onClick={() => navigate(`/results/${result.exam._id}`)}
+          className="px-3 py-1.5 text-xs font-medium text-[#2563EB] hover:text-[#1D4ED8] active:text-[#1E40AF] dark:text-[#93C5FD] dark:hover:text-[#BFDBFE] whitespace-nowrap text-center border border-[#2563EB] rounded-lg hover:bg-[#EFF6FF] dark:hover:bg-[#1e2a4a]/40 transition-all touch-manipulation flex items-center gap-1"
         >
-          View Details &rarr;
+          Details <ArrowRight className="w-3 h-3" />
         </button>
       </div>
     </div>
-  </li>
+  </div>
 );
 
 // Helper function needs to be accessible by ExamCard

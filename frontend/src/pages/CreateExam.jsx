@@ -294,269 +294,270 @@ const CreateExam = () => {
     }, [examId]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-950">
-      <div className="max-w-3xl mx-auto py-6 px-4 sm:px-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Create New Exam</h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Set up your MCQ exam with questions and options
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Exam Details */}
-          <div className="bg-white dark:bg-dark-800 rounded-2xl border border-gray-200 dark:border-dark-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-5">Exam Details</h2>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Exam Title *
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={examData.title}
-                  onChange={handleExamDataChange}
-                  className={`w-full px-4 py-2.5 bg-white dark:bg-dark-900 border rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${errors.title ? 'border-red-500' : 'border-gray-300 dark:border-dark-600'}`}
-                  placeholder="e.g., Mathematics Mid-term Exam"
-                />
-                {errors.title && <p className="mt-1.5 text-sm text-red-600">{errors.title}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Subject *
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  value={examData.subject}
-                  onChange={handleExamDataChange}
-                  className={`w-full px-4 py-2.5 bg-white dark:bg-dark-900 border rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${errors.subject ? 'border-red-500' : 'border-gray-300 dark:border-dark-600'}`}
-                  placeholder="e.g., Mathematics"
-                />
-                {errors.subject && <p className="mt-1.5 text-sm text-red-600">{errors.subject}</p>}
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  value={examData.description}
-                  onChange={handleExamDataChange}
-                  rows={2}
-                  className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-gray-300 dark:border-dark-600 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                  placeholder="Brief description of the exam (optional)"
-                />
-              </div>
-
-          
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Duration (minutes) *
-                </label>
-                <input
-                  type="number"
-                  name="duration"
-                  value={examData.duration}
-                  onChange={handleExamDataChange}
-                  min="1"
-                  className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-gray-300 dark:border-dark-600 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Passing Marks (optional)
-                </label>
-                <input
-                  type="number"
-                  name="passingMarks"
-                  value={examData.passingMarks}
-                  onChange={handleExamDataChange}
-                  min="0"
-                  className="w-full px-4 py-2.5 bg-white dark:bg-dark-900 border border-gray-300 dark:border-dark-600 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Start Time *
-                </label>
-                <input
-                  type="datetime-local"
-                  name="startTime"
-                  value={examData.startTime}
-                  onChange={handleExamDataChange}
-                  min={examId ? undefined : getMinDateTime()}
-                  className={`w-full px-4 py-2.5 bg-white dark:bg-dark-900 border rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${errors.startTime ? 'border-red-500' : 'border-gray-300 dark:border-dark-600'}`}
-                />
-                {errors.startTime && <p className="mt-1.5 text-sm text-red-600">{errors.startTime}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  End Time *
-                </label>
-                <input
-                  type="datetime-local"
-                  name="endTime"
-                  value={examData.endTime}
-                  onChange={handleExamDataChange}
-                  min={examData.startTime || getMinDateTime()}
-                  className={`w-full px-4 py-2.5 bg-white dark:bg-dark-900 border rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${errors.endTime ? 'border-red-500' : 'border-gray-300 dark:border-dark-600'}`}
-                />
-                {errors.endTime && <p className="mt-1 text-sm text-red-600">{errors.endTime}</p>}
-              </div>
-            </div>
+    <div className="min-h-screen bg-[#F4F1EA] dark:bg-[#1A1815]">
+      <div className="flex min-h-screen">
+        <main className="flex-1 px-4 py-4 md:px-6 md:py-6">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#3D3929] dark:text-[#F4F1EA]">Create New Exam</h1>
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base text-[#83786a] dark:text-[#c2b8a3]">
+              Set up your MCQ exam with questions and options
+            </p>
           </div>
 
-          {/* Questions Section */}
-          <div className="bg-white dark:bg-dark-800 rounded-2xl border border-gray-200 dark:border-dark-700 p-6">
-            <div className="flex justify-between items-center mb-5">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Questions ({questions.length})
-              </h2>
-              <button
-                type="button"
-                onClick={addQuestion}
-                className="px-4 py-2 text-sm font-semibold bg-primary-500 text-white rounded-full hover:bg-primary-600 active:bg-primary-700 transition-colors"
-              >
-                Add Question
-              </button>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Exam Details */}
+            <div className="bg-white dark:bg-[#262421] rounded-xl sm:rounded-2xl border border-[#E6E0D4] dark:border-[#3a362f] p-4 sm:p-6">
+              <h2 className="text-lg font-semibold text-[#3D3929] dark:text-[#F4F1EA] mb-5">Exam Details</h2>
 
-            <div className="space-y-4">
-              {questions.map((question, questionIndex) => (
-                <div key={questionIndex} className="bg-gray-50 dark:bg-dark-900 border border-gray-200 dark:border-dark-700 rounded-xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Question {questionIndex + 1}
-                  </h3>
-                  {questions.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeQuestion(questionIndex)}
-                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                    Exam Title *
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={examData.title}
+                    onChange={handleExamDataChange}
+                    className={`w-full px-4 py-2.5 bg-white dark:bg-[#1A1815] border rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] placeholder-[#a89d89] dark:placeholder-[#6b6353] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all ${errors.title ? 'border-red-500' : 'border-[#E6E0D4] dark:border-[#3a362f]'}`}
+                    placeholder="e.g., Mathematics Mid-term Exam"
+                  />
+                  {errors.title && <p className="mt-1.5 text-sm text-red-600">{errors.title}</p>}
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Question Text *
-                    </label>
-                    <textarea
-                      value={question.question}
-                      onChange={(e) => handleQuestionChange(questionIndex, 'question', e.target.value)}
-                      rows={2}
-                      className={`w-full px-4 py-2.5 bg-white dark:bg-dark-800 border rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${errors[`question_${questionIndex}`] ? 'border-red-500' : 'border-gray-300 dark:border-dark-600'}`}
-                      placeholder="Enter your question here..."
-                    />
-                    {errors[`question_${questionIndex}`] && (
-                      <p className="mt-1.5 text-sm text-red-600">{errors[`question_${questionIndex}`]}</p>
+                <div>
+                  <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                    Subject *
+                  </label>
+                  <input
+                    type="text"
+                    name="subject"
+                    value={examData.subject}
+                    onChange={handleExamDataChange}
+                    className={`w-full px-4 py-2.5 bg-white dark:bg-[#1A1815] border rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] placeholder-[#a89d89] dark:placeholder-[#6b6353] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all ${errors.subject ? 'border-red-500' : 'border-[#E6E0D4] dark:border-[#3a362f]'}`}
+                    placeholder="e.g., Mathematics"
+                  />
+                  {errors.subject && <p className="mt-1.5 text-sm text-red-600">{errors.subject}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                    Duration (minutes) *
+                  </label>
+                  <input
+                    type="number"
+                    name="duration"
+                    value={examData.duration}
+                    onChange={handleExamDataChange}
+                    min="1"
+                    className="w-full px-4 py-2.5 bg-white dark:bg-[#1A1815] border border-[#E6E0D4] dark:border-[#3a362f] rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <div className="sm:col-span-2 lg:col-span-3">
+                  <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={examData.description}
+                    onChange={handleExamDataChange}
+                    rows={2}
+                    className="w-full px-4 py-2.5 bg-white dark:bg-[#1A1815] border border-[#E6E0D4] dark:border-[#3a362f] rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] placeholder-[#a89d89] dark:placeholder-[#6b6353] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all"
+                    placeholder="Brief description of the exam (optional)"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                    Passing Marks (optional)
+                  </label>
+                  <input
+                    type="number"
+                    name="passingMarks"
+                    value={examData.passingMarks}
+                    onChange={handleExamDataChange}
+                    min="0"
+                    className="w-full px-4 py-2.5 bg-white dark:bg-[#1A1815] border border-[#E6E0D4] dark:border-[#3a362f] rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                    Start Time *
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="startTime"
+                    value={examData.startTime}
+                    onChange={handleExamDataChange}
+                    min={examId ? undefined : getMinDateTime()}
+                    className={`w-full px-4 py-2.5 bg-white dark:bg-[#1A1815] border rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all ${errors.startTime ? 'border-red-500' : 'border-[#E6E0D4] dark:border-[#3a362f]'}`}
+                  />
+                  {errors.startTime && <p className="mt-1.5 text-sm text-red-600">{errors.startTime}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                    End Time *
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="endTime"
+                    value={examData.endTime}
+                    onChange={handleExamDataChange}
+                    min={examData.startTime || getMinDateTime()}
+                    className={`w-full px-4 py-2.5 bg-white dark:bg-[#1A1815] border rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all ${errors.endTime ? 'border-red-500' : 'border-[#E6E0D4] dark:border-[#3a362f]'}`}
+                  />
+                  {errors.endTime && <p className="mt-1 text-sm text-red-600">{errors.endTime}</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Questions Section */}
+            <div className="bg-white dark:bg-[#262421] rounded-xl sm:rounded-2xl border border-[#E6E0D4] dark:border-[#3a362f] p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-5">
+                <h2 className="text-lg font-semibold text-[#3D3929] dark:text-[#F4F1EA]">
+                  Questions ({questions.length})
+                </h2>
+                <button
+                  type="button"
+                  onClick={addQuestion}
+                  className="px-4 py-2 text-sm font-semibold bg-[#2563EB] text-white rounded-full hover:bg-[#1D4ED8] active:bg-[#1E40AF] transition-colors"
+                >
+                  Add Question
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {questions.map((question, questionIndex) => (
+                  <div key={questionIndex} className="bg-[#FAF8F3] dark:bg-[#1A1815] border border-[#E6E0D4] dark:border-[#3a362f] rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-[#3D3929] dark:text-[#F4F1EA]">
+                      Question {questionIndex + 1}
+                    </h3>
+                    {questions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeQuestion(questionIndex)}
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                     )}
                   </div>
 
-                  <div className="space-y-3">
-                    {question.options.map((option, optionIndex) => (
-                      <div key={optionIndex}>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="radio"
-                            name={`correct_${questionIndex}`}
-                            checked={option.isCorrect}
-                            onChange={() => handleCorrectOptionChange(questionIndex, optionIndex)}
-                            className="w-4 h-4 text-primary-600 focus:ring-2 focus:ring-primary-500 cursor-pointer"
-                          />
-                          <input
-                            type="text"
-                            value={option.text}
-                            onChange={(e) => handleOptionChange(questionIndex, optionIndex, e.target.value)}
-                            className={`flex-1 px-4 py-2.5 bg-white dark:bg-dark-800 border rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${errors[`option_${questionIndex}_${optionIndex}`] ? 'border-red-500' : 'border-gray-300 dark:border-dark-600'}`}
-                            placeholder={`Option ${optionIndex + 1}`}
-                          />
-                        </div>
-                        {errors[`option_${questionIndex}_${optionIndex}`] && (
-                          <p className="mt-1.5 ml-7 text-sm text-red-600">{errors[`option_${questionIndex}_${optionIndex}`]}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {errors[`correct_${questionIndex}`] && (
-                    <p className="text-sm text-red-600">{errors[`correct_${questionIndex}`]}</p>
-                  )}
-
-                  <div className="flex items-center gap-6 pt-2">
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Marks:
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3] mb-2">
+                        Question Text *
                       </label>
-                      <input
-                        type="number"
-                        value={question.marks}
-                        onChange={(e) => handleQuestionChange(questionIndex, 'marks', parseInt(e.target.value) || 1)}
-                        min="1"
-                        max="10"
-                        className="w-16 px-3 py-1.5 bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-600 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                      <textarea
+                        value={question.question}
+                        onChange={(e) => handleQuestionChange(questionIndex, 'question', e.target.value)}
+                        rows={2}
+                        className={`w-full px-4 py-2.5 bg-white dark:bg-[#262421] border rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] placeholder-[#a89d89] dark:placeholder-[#6b6353] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all ${errors[`question_${questionIndex}`] ? 'border-red-500' : 'border-[#E6E0D4] dark:border-[#3a362f]'}`}
+                        placeholder="Enter your question here..."
                       />
+                      {errors[`question_${questionIndex}`] && (
+                        <p className="mt-1.5 text-sm text-red-600">{errors[`question_${questionIndex}`]}</p>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Time (seconds):
-                      </label>
-                      <input
-                        type="number"
-                        value={question.timePerQuestion}
-                        onChange={(e) => handleQuestionChange(questionIndex, 'timePerQuestion', parseInt(e.target.value) || 60)}
-                        min="10"
-                        max="600"
-                        className="w-20 px-3 py-1.5 bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-600 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
-                      />
+
+                    <div className="space-y-3">
+                      {question.options.map((option, optionIndex) => (
+                        <div key={optionIndex}>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="radio"
+                              name={`correct_${questionIndex}`}
+                              checked={option.isCorrect}
+                              onChange={() => handleCorrectOptionChange(questionIndex, optionIndex)}
+                              className="w-4 h-4 text-[#2563EB] focus:ring-2 focus:ring-[#2563EB] cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={option.text}
+                              onChange={(e) => handleOptionChange(questionIndex, optionIndex, e.target.value)}
+                              className={`flex-1 px-4 py-2.5 bg-white dark:bg-[#262421] border rounded-xl text-sm text-[#3D3929] dark:text-[#F4F1EA] placeholder-[#a89d89] dark:placeholder-[#6b6353] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all ${errors[`option_${questionIndex}_${optionIndex}`] ? 'border-red-500' : 'border-[#E6E0D4] dark:border-[#3a362f]'}`}
+                              placeholder={`Option ${optionIndex + 1}`}
+                            />
+                          </div>
+                          {errors[`option_${questionIndex}_${optionIndex}`] && (
+                            <p className="mt-1.5 ml-7 text-sm text-red-600">{errors[`option_${questionIndex}_${optionIndex}`]}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {errors[`correct_${questionIndex}`] && (
+                      <p className="text-sm text-red-600">{errors[`correct_${questionIndex}`]}</p>
+                    )}
+
+                    <div className="flex items-center gap-6 pt-2">
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3]">
+                          Marks:
+                        </label>
+                        <input
+                          type="number"
+                          value={question.marks}
+                          onChange={(e) => handleQuestionChange(questionIndex, 'marks', parseInt(e.target.value) || 1)}
+                          min="1"
+                          max="10"
+                          className="w-16 px-3 py-1.5 bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg text-sm text-[#3D3929] dark:text-[#F4F1EA] focus:outline-none focus:ring-2 focus:ring-[#2563EB] transition-all"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-[#3D3929] dark:text-[#c2b8a3]">
+                          Time (seconds):
+                        </label>
+                        <input
+                          type="number"
+                          value={question.timePerQuestion}
+                          onChange={(e) => handleQuestionChange(questionIndex, 'timePerQuestion', parseInt(e.target.value) || 60)}
+                          min="10"
+                          max="600"
+                          className="w-20 px-3 py-1.5 bg-white dark:bg-[#262421] border border-[#E6E0D4] dark:border-[#3a362f] rounded-lg text-sm text-[#3D3929] dark:text-[#F4F1EA] focus:outline-none focus:ring-2 focus:ring-[#2563EB] transition-all"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
+              ))}
               </div>
-            ))}
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/teacher-dashboard')}
-              className="px-6 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-dark-800 transition-colors"
-            >
-              Cancel
-            </button>
-            {/* <button
-              type="button"
-              disabled={loading}
-              onClick={handleSaveDraft}
-              className="px-6 py-2.5 text-sm font-semibold bg-gray-200 dark:bg-dark-700 text-gray-800 dark:text-gray-200 rounded-full hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Saving...' : 'Save as Draft'}
-            </button> */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2.5 text-sm font-semibold bg-primary-500 text-white rounded-full hover:bg-primary-600 active:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Saving...' : (examId ? 'Save Changes' : 'Save as Draft')}
-            </button>
-          </div>
-        </form>
+            {/* Submit Button */}
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => navigate('/teacher-dashboard')}
+                className="px-6 py-2.5 text-sm font-semibold text-[#3D3929] dark:text-[#c2b8a3] rounded-full hover:bg-[#E6E0D4] dark:hover:bg-[#3a362f] transition-colors"
+              >
+                Cancel
+              </button>
+              {/* <button
+                type="button"
+                disabled={loading}
+                onClick={handleSaveDraft}
+                className="px-6 py-2.5 text-sm font-semibold bg-gray-200 dark:bg-dark-700 text-gray-800 dark:text-gray-200 rounded-full hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Saving...' : 'Save as Draft'}
+              </button> */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-2.5 text-sm font-semibold bg-[#2563EB] text-white rounded-full hover:bg-[#1D4ED8] active:bg-[#1E40AF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Saving...' : (examId ? 'Save Changes' : 'Save as Draft')}
+              </button>
+            </div>
+          </form>
+        </main>
       </div>
     </div>
   );
